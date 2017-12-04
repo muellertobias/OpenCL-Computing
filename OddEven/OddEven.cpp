@@ -18,7 +18,6 @@
 using namespace std;
 
 void testOpenCL(const char* kernelSource);
-void callGPU(cl_event& event, cl_int &err, const cl_command_queue &queue, const size_t &bytes, const cl_kernel &kernel, cl_mem &d_X, size_t &globalSize, size_t &localSize, type *h_X, const size_t &range);
 char* readSourceFile(const char* filename);
 
 //using namespace std;
@@ -102,12 +101,9 @@ void testOpenCL(const char* kernelSource)
 	context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
 	printf("CreateContext: %d\n", err);
 
-
-	cl_event event;
-
 	// Create a command queue 
-	queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
-	//queue = clCreateCommandQueue(context, device_id, NULL, &err);
+	//queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
+	queue = clCreateCommandQueue(context, device_id, NULL, &err);
 	printf("CreateCommandQueue: %d\n", err);
 
 	// Create the compute program from the source buffer
@@ -133,7 +129,7 @@ void testOpenCL(const char* kernelSource)
 	err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_X);
 
 	// Execute the kernel over the entire range of the data set  
-	err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &n, &l, 0, NULL, &event);
+	err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &n, &l, 0, NULL, NULL);
 
 	// Wait for the command queue to get serviced before reading back results
 	clFinish(queue);
