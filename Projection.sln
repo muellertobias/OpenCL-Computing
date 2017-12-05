@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Projection", "Projection\Projection.vcxproj", "{E69F43B1-38B2-4C5B-9416-D88694956D5C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OddEven", "OddEven\OddEven.vcxproj", "{DA0772E9-4074-4C3D-9BB4-CCE093C422A5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Regularisierung", "Regularisierung\Regularisierung.vcxproj", "{92F6CF84-3C85-4344-A75C-92C35D39AB54}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kompaktisierung", "Kompaktisierung\Kompaktisierung.vcxproj", "{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{92F6CF84-3C85-4344-A75C-92C35D39AB54}.Release|x64.Build.0 = Release|x64
 		{92F6CF84-3C85-4344-A75C-92C35D39AB54}.Release|x86.ActiveCfg = Release|Win32
 		{92F6CF84-3C85-4344-A75C-92C35D39AB54}.Release|x86.Build.0 = Release|Win32
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Debug|x64.ActiveCfg = Debug|x64
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Debug|x64.Build.0 = Debug|x64
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Debug|x86.ActiveCfg = Debug|Win32
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Debug|x86.Build.0 = Debug|Win32
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Release|x64.ActiveCfg = Release|x64
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Release|x64.Build.0 = Release|x64
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Release|x86.ActiveCfg = Release|Win32
+		{2F8CC70C-17D7-4FBF-BEB3-0AC6FE69B38E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
