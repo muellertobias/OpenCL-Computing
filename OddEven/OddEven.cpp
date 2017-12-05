@@ -74,8 +74,8 @@ void testOpenCL(const char* kernelSource)
 	err = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t) * max_work_item_dimensions, max_work_item_sizes, NULL);
 	printf("\n \n");
 
-	size_t matrixSizeX = 4;
-	size_t matrixSizeY = 3;
+	size_t matrixSizeX = 16;
+	size_t matrixSizeY = 4;
 
 	size_t localSize = matrixSizeX * matrixSizeY;
 	size_t globalSize = matrixSizeX * matrixSizeY;
@@ -90,8 +90,8 @@ void testOpenCL(const char* kernelSource)
 	printf("CreateContext: %d\n", err);
 
 	// Create a command queue 
-	//queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
-	queue = clCreateCommandQueue(context, device_id, NULL, &err);
+	queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
+	//queue = clCreateCommandQueue(context, device_id, NULL, &err);
 	printf("CreateCommandQueue: %d\n", err);
 
 	// Create the compute program from the source buffer
