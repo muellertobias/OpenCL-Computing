@@ -13,10 +13,7 @@ __kernel void OpenCLID(__global int *X, const unsigned int sizeX, const unsigned
 		} else {
 			int id =  localID-sizeX/2;
 			int column = ((id % sizeX) + (id % sizeX/sizeX))*(sizeY*sizeX/(sizeX/2));
-			X[localID] = (column +(localID / sizeX) * 2)+1;
-		}
-		
-
-		
+			X[localID] = (column + (localID / sizeX) * 2) +1;
+		}	
 	}
 }  
