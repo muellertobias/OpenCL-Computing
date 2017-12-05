@@ -100,12 +100,9 @@ void testOpenCL(const char* kernelSource)
 	context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
 	printf("CreateContext: %d\n", err);
 
-
-	cl_event event;
-
 	// Create a command queue 
-	queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
-	//queue = clCreateCommandQueue(context, device_id, NULL, &err);
+	//queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
+	queue = clCreateCommandQueue(context, device_id, NULL, &err);
 	printf("CreateCommandQueue: %d\n", err);
 
 	// Create the compute program from the source buffer
@@ -127,9 +124,6 @@ void testOpenCL(const char* kernelSource)
 	err = clEnqueueWriteBuffer(queue, d_a, CL_TRUE, 0, bytes, h_a, 0, NULL, NULL);
 	err |= clEnqueueWriteBuffer(queue, d_b, CL_TRUE, 0, bytes, h_b, 0, NULL, NULL);
 
-
-	size_t l = max_work_item_sizes[0];
-	//size_t g = 2048;
 	// Set the arguments to our compute kernel
 	err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_a);
 	err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &d_b);
@@ -137,15 +131,17 @@ void testOpenCL(const char* kernelSource)
 	err |= clSetKernelArg(kernel, 3, sizeof(unsigned int), &vectorSize);
 
 	// Execute the kernel over the entire range of the data set  
-	err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &n, &l, 0, NULL, &event);
-
+	err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &globalSize, &localSize, 0, NULL, NULL);
+	printf("EnqueueNDRangeKernel: %d\n", err);
+	
 	// Wait for the command queue to get serviced before reading back results
 	clFinish(queue);
 
 	// Read the results from the device
 	clEnqueueReadBuffer(queue, d_c, CL_TRUE, 0, bytes, h_c, 0, NULL, NULL);
 
-	for (int i = 0; i < vectorSize;i++) {
+	for (int i = 0; i < vectorSize;i++)
+	{
 		printf("%d\n", h_c[i]);
 	}
 	// release OpenCL resources
