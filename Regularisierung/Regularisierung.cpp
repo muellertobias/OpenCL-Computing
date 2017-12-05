@@ -12,10 +12,11 @@
 #include <string>
 #include <sstream>
 
-#define type int // float, double
+#define type float // float, double
 
 using namespace std;
 
+void print(type* values, int n);
 void testOpenCL(const char* kernelSource);
 char* readSourceFile(const char* filename);
 
@@ -29,7 +30,6 @@ int main(int argc, char* argv[])
 	// Initialize vectors on host
 	printf_s("init...\n");
 	testOpenCL(kernelSource);
-	//int id = 0;
 
 	printf("Press any key and then press enter...");
 	return getchar();
@@ -51,20 +51,11 @@ void testOpenCL(const char* kernelSource)
 	cl_kernel kernel;				  // kernel
 
 	cl_int err;
+
 	// Host output array
 	type *h_a;
 	type *h_b;
 	type *h_c;
-
-	size_t n = 1;
-
-	// Number of work items in each local work group
-
-	// use CL_DEVICE_MAX_WORK_ITEM_SIZES
-	cl_uint max_work_item_dimensions;
-
-
-	//printf("CL_DEVICE_MAX_WORK_ITEM_SIZES: ");
 
 	// Bind to platform
 	err = clGetPlatformIDs(1, &cpPlatform, NULL);
@@ -74,10 +65,6 @@ void testOpenCL(const char* kernelSource)
 	err = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
 	printf("GetDeviceIDs: %d\n", err);
 
-	err = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(max_work_item_dimensions), &max_work_item_dimensions, NULL);
-	size_t* max_work_item_sizes = (size_t*)malloc(sizeof(size_t) * max_work_item_dimensions);
-	err = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t) * max_work_item_dimensions, max_work_item_sizes, NULL);
-	
 	size_t vectorSize = 16;
 
 	size_t localSize = vectorSize;
@@ -89,10 +76,13 @@ void testOpenCL(const char* kernelSource)
 	h_a = (type*)malloc(bytes);
 	h_b = (type*)malloc(bytes);
 
-	for (int i = 0;i < vectorSize;i++) {
-		h_a[i] = 1;
-		h_b[i] = 1;
+	for (int i = 0;i < vectorSize;i++) 
+	{
+		h_a[i] = 1.0f;
+		h_b[i] = 1.0f;
 	}
+
+	print(h_b, vectorSize);
 	h_c = (type*)malloc(bytes);
 	memset(h_c, NULL, bytes);
 
@@ -123,6 +113,7 @@ void testOpenCL(const char* kernelSource)
 
 	err = clEnqueueWriteBuffer(queue, d_a, CL_TRUE, 0, bytes, h_a, 0, NULL, NULL);
 	err |= clEnqueueWriteBuffer(queue, d_b, CL_TRUE, 0, bytes, h_b, 0, NULL, NULL);
+	printf("clEnqueueWriteBuffer: %d\n", err);
 
 	// Set the arguments to our compute kernel
 	err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_a);
@@ -140,10 +131,8 @@ void testOpenCL(const char* kernelSource)
 	// Read the results from the device
 	clEnqueueReadBuffer(queue, d_c, CL_TRUE, 0, bytes, h_c, 0, NULL, NULL);
 
-	for (int i = 0; i < vectorSize;i++)
-	{
-		printf("%d\n", h_c[i]);
-	}
+	print(h_c, vectorSize);
+
 	// release OpenCL resources
 	clReleaseProgram(program);
 	clReleaseKernel(kernel);
@@ -153,6 +142,14 @@ void testOpenCL(const char* kernelSource)
 	free(h_a);
 	free(h_b);
 	free(h_c);
+}
+
+void print(type* values, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		printf("%f\n", values[i]);
+	}
 }
 
 char* readSourceFile(const char* filename)
