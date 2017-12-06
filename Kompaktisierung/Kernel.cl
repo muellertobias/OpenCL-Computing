@@ -60,7 +60,10 @@ calcmandel2(int *a,int N,int M)
 	x=listex[idx]; 
 	y=listey[idx];
 	z=startwert(x,y);
-	for(i=0;i<16;i++) z=F(z);
+	for(i=0;i<16;i++)
+	{
+		z=F(z);
+	}
 	cnt=16;
 
 	for(i=16;i<255;i++)
