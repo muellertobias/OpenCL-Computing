@@ -6,22 +6,28 @@ __kernel void mandelbrot(__global int* matrix, const unsigned int width, const u
 
 	if (index < width * height) 
 	{
+		// zoom!
+		float zoomFactor = 1.0f / 1.0f;
+
 		int counter = 0;
-		int x = index % width;				// Spalte
-		int y = (index - x) / height;		// Zeile
+		float x = ((index % width) - (width / 2.0f)) / 10.f;				// Spalte
+		float y = ((index - x) / height - (height / 2.0f)) / 10.f;		// Zeile
 
-		float cReal = x;
-		float cImag = y;
+		x *= zoomFactor;
+		y *= zoomFactor;
 
-		for (int i = 0; i < 256; ++i) 
+		float cReal = 0.0f;
+		float cImag = 0.0f;
+
+		for (int i = 0; i < 255; ++i) 
 		{
 			if ((cReal * cReal + cImag * cImag) <= 4.0f) 
 			{
 				float re = cReal;
 				float im = cImag;
 
-				cReal = re * re - im * im;
-				cImag = 2.0f * re * im;
+				cReal = re * re - im * im + x;
+				cImag = 2.0f * re * im + y;
 
 				counter++;
 			}
@@ -32,7 +38,7 @@ __kernel void mandelbrot(__global int* matrix, const unsigned int width, const u
 }  
 
 // Programme vom Keller um Mandelbrot Bild zu erzeugen
-/*calcmandel(int *a,int N,int M){
+/*calcmandel(int *a,int N,int M) {
 
 	int x,y,i,cnt; 
 	complex z;

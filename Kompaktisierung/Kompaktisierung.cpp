@@ -9,6 +9,7 @@
 #include <time.h>
 #include <string>
 #include <sstream>
+#include <Windows.h>
 
 #define type int // float, double
 
@@ -16,6 +17,7 @@ using namespace std;
 
 void print(type* matrix, int width, int height);
 void print(type* values, int n);
+void colorPrint(type* matrix, int width, int height);
 void testOpenCL(const char* kernelSource);
 char* readSourceFile(const char* filename);
 
@@ -33,8 +35,8 @@ int main(int argc, char* argv[])
 
 void testOpenCL(const char* kernelSource)
 {
-	size_t width = 15;
-	size_t height = 10;
+	size_t width = 50;
+	size_t height = 50;
 
 	// Device output buffer
 	cl_mem d_input;
@@ -60,11 +62,11 @@ void testOpenCL(const char* kernelSource)
 
 	size_t size = height * width;
 	size_t localSize = 256;
-	size_t globalSize = 256;
-	int bytes = height * width * sizeof(int);
+	size_t globalSize = globalSize = ceil(size / (float)localSize) * localSize;;
+	int bytes = height * width * sizeof(type);
 
 	// Allocate memory for each vector on host
-	int* matrix = (int*)malloc(bytes);
+	type* matrix = (type*)malloc(bytes);
 	memset(matrix, 0, bytes);
 
 	// Create a context  
@@ -72,8 +74,8 @@ void testOpenCL(const char* kernelSource)
 	printf("CreateContext: %d\n", err);
 
 	// Create a command queue 
-	queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
-	//queue = clCreateCommandQueue(context, device_id, NULL, &err);
+	//queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
+	queue = clCreateCommandQueue(context, device_id, NULL, &err);
 	printf("CreateCommandQueue: %d\n", err);
 
 	// Create the compute program from the source buffer
@@ -108,7 +110,7 @@ void testOpenCL(const char* kernelSource)
 	// Read the results from the device
 	clEnqueueReadBuffer(queue, d_input, CL_TRUE, 0, bytes, matrix, 0, NULL, NULL);
 
-	print(matrix, width, height);
+	colorPrint(matrix, width, height);
 
 	// release OpenCL resources
 	clReleaseProgram(program);
@@ -123,7 +125,7 @@ void print(type* values, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		printf("%f\n", values[i]);
+		printf("%d\n", values[i]);
 	}
 }
 
@@ -139,8 +141,20 @@ void print(type* matrix, int width, int height)
 	}
 }
 
+void colorPrint(type* matrix, int width, int height) 
+{
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
-
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			SetConsoleTextAttribute(console, matrix[i * width + j]);
+			printf("0");
+		}
+		printf("\n");
+	}
+}
 
 char* readSourceFile(const char* filename)
 {
