@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 void testOpenCL(const char* kernelSource)
 {
-	size_t width = 125;
+	size_t width = 100; // max 100
 	size_t height = width;
 
 	// Device output buffer
