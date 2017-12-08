@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 void testOpenCL(const char* kernelSource)
 {
-	size_t width = 150;
+	size_t width = 125;
 	size_t height = width;
 
 	// Device output buffer
@@ -63,20 +63,19 @@ void testOpenCL(const char* kernelSource)
 
 	size_t localSize = height;
 	size_t globalSize = globalSize = ceil(height / (float)localSize) * localSize;;
-	int bytesMatrix = height * width * sizeof(type);
+	int bytes = height * width * sizeof(type);
 	
 	// Allocate memory for each vector on host
-	type* matrix = (type*)malloc(bytesMatrix);
-	memset(matrix, 0, bytesMatrix);
+	type* matrix = (type*)malloc(bytes);
+	memset(matrix, 0, bytes);
 
 	calcMandel(matrix, width, height);
 
-	int bytesList = height * sizeof(int);
-	int* listX = (int*)malloc(height * sizeof(int));
-	memset(listX, 0, height * sizeof(int));
+	int* listX = (int*)malloc(bytes);
+	memset(listX, 0, bytes);
 
-	int* listY = (int*)malloc(height * sizeof(int));
-	memset(listY, 0, height * sizeof(int));
+	int* listY = (int*)malloc(bytes);
+	memset(listY, 0, bytes);
 
 	// Create a context  
 	context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
@@ -99,18 +98,18 @@ void testOpenCL(const char* kernelSource)
 	printf("CreateKernel: %d\n", err);
 
 	// Create the input and output arrays in device memory for our calculation
-	d_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY, bytesMatrix, NULL, NULL);
-	d_listX = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytesList, NULL, NULL);
-	d_listY = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytesList, NULL, NULL);
+	d_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY, bytes, NULL, NULL);
+	d_listX = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytes, NULL, NULL);
+	d_listY = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytes, NULL, NULL);
 
-	err = clEnqueueWriteBuffer(queue, d_matrix, CL_TRUE, 0, bytesMatrix, matrix, 0, NULL, NULL);
+	err = clEnqueueWriteBuffer(queue, d_matrix, CL_TRUE, 0, bytes, matrix, 0, NULL, NULL);
 	printf("clEnqueueWriteBuffer: %d\n", err);
 
 	// Set the arguments to our compute kernel
 	err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_matrix);
 	err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &d_listX);
 	err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &d_listY);
-	err |= clSetKernelArg(kernel, 3, height * sizeof(int), NULL);
+	err |= clSetKernelArg(kernel, 3, bytes, NULL);
 
 	// Execute the kernel over the entire range of the data set  
 	err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &globalSize, &localSize, 0, NULL, NULL);
@@ -120,14 +119,16 @@ void testOpenCL(const char* kernelSource)
 	clFinish(queue);
 
 	// Read the results from the device
-	clEnqueueReadBuffer(queue, d_listX, CL_TRUE, 0, bytesList, listX, 0, NULL, NULL);
-	clEnqueueReadBuffer(queue, d_listY, CL_TRUE, 0, bytesList, listY, 0, NULL, NULL);
+	clEnqueueReadBuffer(queue, d_listX, CL_TRUE, 0, bytes, listX, 0, NULL, NULL);
+	clEnqueueReadBuffer(queue, d_listY, CL_TRUE, 0, bytes, listY, 0, NULL, NULL);
 
 	// print listX and listY
-	printf("ListX:\n");
-	print(listX, height);
-	printf("\nListY:\n");
-	print(listY, height);
+	printf("Lists:\n");
+	for (int i = 0; i < height * width; i++)
+	{
+		if (listX[i] != 0 && listY[i] != 0 && i > 0)
+			printf("%d %d\n", listX[i], listY[i]);
+	}
 
 	colorPrint(matrix, width, height);
 
