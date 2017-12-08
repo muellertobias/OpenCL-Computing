@@ -15,6 +15,7 @@
 
 using namespace std;
 
+void calcMandel(type* matrix, int width, int height);
 void print(type* matrix, int width, int height);
 void print(type* values, int n);
 void colorPrint(type* matrix, int width, int height);
@@ -35,8 +36,8 @@ int main(int argc, char* argv[])
 
 void testOpenCL(const char* kernelSource)
 {
-	size_t width = 50;
-	size_t height = 50;
+	size_t width = 150;
+	size_t height = 100;
 
 	// Device output buffer
 	cl_mem d_input;
@@ -68,6 +69,11 @@ void testOpenCL(const char* kernelSource)
 	// Allocate memory for each vector on host
 	type* matrix = (type*)malloc(bytes);
 	memset(matrix, 0, bytes);
+
+	calcMandel(matrix, width, height);
+	colorPrint(matrix, width, height);
+
+	return;
 
 	// Create a context  
 	context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
@@ -119,6 +125,37 @@ void testOpenCL(const char* kernelSource)
 	clReleaseContext(context);
 
 	free(matrix);
+}
+
+void calcMandel(type* matrix, int width, int height) 
+{
+	for (int index = 0; index < width * height; index++) 
+	{
+		int counter = 0;
+		float x = ((index % width) - (width / 2.0f)) / (width / 2.0f);				// Spalte
+		float y = ((index - x) / height - (height / 2.0f)) / (height / 2.0f);		// Zeile
+
+		x -= 0.5f; // Verschiebung nach links
+
+		float cReal = 0.0f;
+		float cImag = 0.0f;
+
+		for (int i = 0; i < 16; ++i)
+		{
+			if ((cReal * cReal + cImag * cImag) <= 4.0f)
+			{
+				float re = cReal;
+				float im = cImag;
+
+				cReal = re * re - im * im + x;
+				cImag = 2.0f * re * im + y;
+
+				counter++;
+			}
+		}
+
+		matrix[index] = counter;
+	}
 }
 
 void print(type* values, int n)
