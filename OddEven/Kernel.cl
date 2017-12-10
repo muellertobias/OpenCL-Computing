@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-__kernel void OpenCLID(__global int *matrix, const unsigned int sizeX, const unsigned int sizeY)
+__kernel void OddEven(__global int *matrix, const unsigned int sizeX, const unsigned int sizeY)
 {
 	int globalID = get_global_id(0);
 

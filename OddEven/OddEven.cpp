@@ -93,7 +93,7 @@ void testOpenCL(const char* kernelSource)
 	clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
 
 	// Create the compute kernel in the program we wish to run
-	kernel = clCreateKernel(program, "OpenCLID", &err);
+	kernel = clCreateKernel(program, "OddEven", &err);
 	printf("CreateKernel: %d\n", err);
 
 	// Create the input and output arrays in device memory for our calculation
