@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-__kernel void OpenCLID(__global int *X)
+__kernel void Project(__global int *indexes)
 {
 	int i = get_global_id(0);
 
@@ -11,5 +11,5 @@ __kernel void OpenCLID(__global int *X)
 	int exponent = groupID - (groupID & 1);
 	int offset = exponent * groupSize;
 
-	X[i] = offset + 2 * localID + (groupID & 1);
+	indexes[i] = offset + 2 * localID + (groupID & 1);
 }  
