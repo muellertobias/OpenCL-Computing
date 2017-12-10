@@ -40,7 +40,7 @@ void testOpenCL(const char* kernelSource)
 {
 
 	// Device output buffer
-	cl_mem d_X;
+	cl_mem d_matrix;
 
 	cl_platform_id cpPlatform;		  // OpenCL platform
 	cl_device_id device_id;           // device ID
@@ -50,15 +50,11 @@ void testOpenCL(const char* kernelSource)
 	cl_kernel kernel;				  // kernel
 
 	cl_int err;
+
 	// Host output array
 	type *h_matrix;
 
-	// Number of work items in each local work group
-	// use CL_DEVICE_MAX_WORK_ITEM_SIZES
-	cl_uint max_work_item_dimensions;
-
-
-	//printf("CL_DEVICE_MAX_WORK_ITEM_SIZES: ");
+	
 
 	// Bind to platform
 	err = clGetPlatformIDs(1, &cpPlatform, NULL);
@@ -68,15 +64,10 @@ void testOpenCL(const char* kernelSource)
 	err = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
 	printf("GetDeviceIDs: %d\n", err);
 
-	// Devide Info
-	err = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(max_work_item_dimensions), &max_work_item_dimensions, NULL);
-	size_t* max_work_item_sizes = (size_t*)malloc(sizeof(size_t) * max_work_item_dimensions);
-	err = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t) * max_work_item_dimensions, max_work_item_sizes, NULL);
-	printf("\n \n");
-
 	size_t matrixSizeX = 16;
 	size_t matrixSizeY = 4;
 
+	// Number of work items in each local work group
 	size_t localSize = matrixSizeX * matrixSizeY;
 	size_t globalSize = matrixSizeX * matrixSizeY;
 
@@ -90,8 +81,8 @@ void testOpenCL(const char* kernelSource)
 	printf("CreateContext: %d\n", err);
 
 	// Create a command queue 
-	queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
-	//queue = clCreateCommandQueue(context, device_id, NULL, &err);
+	//queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
+	queue = clCreateCommandQueue(context, device_id, NULL, &err);
 	printf("CreateCommandQueue: %d\n", err);
 
 	// Create the compute program from the source buffer
@@ -106,12 +97,12 @@ void testOpenCL(const char* kernelSource)
 	printf("CreateKernel: %d\n", err);
 
 	// Create the input and output arrays in device memory for our calculation
-	d_X = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytes, NULL, NULL);
+	d_matrix = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytes, NULL, NULL);
 
-	err = clEnqueueWriteBuffer(queue, d_X, CL_TRUE, 0, bytes, h_matrix, 0, NULL, NULL);
+	err = clEnqueueWriteBuffer(queue, d_matrix, CL_TRUE, 0, bytes, h_matrix, 0, NULL, NULL);
 
 	// Set the arguments to our compute kernel
-	err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_X);
+	err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_matrix);
 	err = clSetKernelArg(kernel, 1, sizeof(unsigned int), &matrixSizeX);
 	err = clSetKernelArg(kernel, 2, sizeof(unsigned int), &matrixSizeY);
 
@@ -122,7 +113,7 @@ void testOpenCL(const char* kernelSource)
 	clFinish(queue);
 
 	// Read the results from the device
-	clEnqueueReadBuffer(queue, d_X, CL_TRUE, 0, bytes, h_matrix, 0, NULL, NULL);
+	clEnqueueReadBuffer(queue, d_matrix, CL_TRUE, 0, bytes, h_matrix, 0, NULL, NULL);
 	if (err == CL_SUCCESS) 
 		printMatrix(h_matrix, matrixSizeX, matrixSizeY);
 
