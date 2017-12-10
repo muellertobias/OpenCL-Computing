@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
 
 void testOpenCL(const char* kernelSource)
 {
-	size_t width = 100; // max 100
+	size_t width = 100; // max 100, daher nur beschränkt sich die Berechnung auf lediglich einen Block
+						// Werte größer 100 für zu einer OUT_OF_RESOURCES-Exception durch OpenCL.
 	size_t height = width;
 
 	// Device output buffer
