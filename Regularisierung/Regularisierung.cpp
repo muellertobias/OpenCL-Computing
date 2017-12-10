@@ -12,6 +12,12 @@
 #include <string>
 #include <sstream>
 
+/* 
+	Lösung für Aufgabe 2:
+	Die Enschränkung des Wertebereichs der Vektor a und b beträgt jeweils: abs(sizeof(type) / 2), 
+	da zu einem Überlauf kommen kann, wenn Werte größer abs(sizeof(type) / 2) addiert bzw. subtrahiert werden
+*/
+
 #define type float // float, double
 
 using namespace std;
@@ -91,8 +97,8 @@ void testOpenCL(const char* kernelSource)
 	printf("CreateContext: %d\n", err);
 
 	// Create a command queue 
-	queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
-	//squeue = clCreateCommandQueue(context, device_id, NULL, &err);
+	//queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &err);
+	queue = clCreateCommandQueue(context, device_id, NULL, &err);
 	printf("CreateCommandQueue: %d\n", err);
 
 	// Create the compute program from the source buffer
@@ -134,6 +140,9 @@ void testOpenCL(const char* kernelSource)
 	print(h_c, vectorSize);
 
 	// release OpenCL resources
+	clReleaseMemObject(d_a);
+	clReleaseMemObject(d_b);
+	clReleaseMemObject(d_c);
 	clReleaseProgram(program);
 	clReleaseKernel(kernel);
 	clReleaseCommandQueue(queue);

@@ -38,7 +38,6 @@ int main(int argc, char* argv[])
 
 void testOpenCL(const char* kernelSource)
 {
-
 	// Device output buffer
 	cl_mem d_matrix;
 
