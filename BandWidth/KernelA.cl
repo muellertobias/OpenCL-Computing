@@ -11,8 +11,10 @@ __kernel void sum(__global int *values, const unsigned int n_values, __global in
 	if (id < n)
 	{
 		int sum = 0;
+		unsigned int start = n * id;
+		unsigned int stop = n * (id + 1) - 1;
 
-		for (unsigned int i = n * id; i <= n * (id + 1) - 1; i++) 
+		for (unsigned int i = start; i <= stop; i++) 
 		{
 			sum += values[i];
 		}
